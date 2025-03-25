@@ -1,10 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import MinValueValidator, MaxValueValidator
 import joblib
 import os
 from django.conf import settings
 import numpy as np
+from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
@@ -13,6 +14,19 @@ class User(AbstractUser):
     education = models.CharField(max_length=100)
     current_job = models.CharField(max_length=100, blank=True, null=True)
     
+    # Adding related_name to prevent reverse accessor clashes
+    groups = models.ManyToManyField(
+        Group, 
+        related_name='courses_user_set',  # Custom reverse accessor for groups
+        blank=True
+    )
+    
+    user_permissions = models.ManyToManyField(
+        Permission, 
+        related_name='courses_user_permissions_set',  # Custom reverse accessor for user_permissions
+        blank=True
+    )
+
     def __str__(self):
         return self.username
 

@@ -1,10 +1,9 @@
+import os
+import random
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import joblib
-import os
-from django.conf import settings
-import random
 
 def train_and_save_model():
     # This is sample data - in a real app, you'd use actual user responses
@@ -27,12 +26,16 @@ def train_and_save_model():
     model = RandomForestClassifier(n_estimators=100)
     model.fit(X_train, y_train)
     
-    # Save the model
-    model_path = os.path.join(settings.BASE_DIR, 'courses', 'ml_model', 'classifier.pkl')
+    # Save the model - using relative path instead of Django settings
+    model_dir = os.path.join(os.path.dirname(__file__), '..', 'ml_model')
+    os.makedirs(model_dir, exist_ok=True)
+    
+    model_path = os.path.join(model_dir, 'classifier.pkl')
     joblib.dump(model, model_path)
     
     print(f"Model trained and saved to {model_path}")
     print(f"Test accuracy: {model.score(X_test, y_test)}")
 
 if __name__ == "__main__":
+    # For standalone execution, we'll use relative paths
     train_and_save_model()
